@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How well my GF knows me</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .quiz-container {
+      background: white;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      max-width: 650px;
+      width: 100%;
+      text-align: center;
+    }
+
+    h1 { color: #333; margin-bottom: 10px; }
+    
+    .progress {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 1.1rem;
+    }
+
+    .question {
+      font-size: 1.45rem;
+      margin-bottom: 40px;
+      color: #444;
+      min-height: 80px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 16px 35px;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      min-width: 160px;
+      transition: all 0.3s;
+    }
+
+    button:hover {
+      transform: scale(1.08);
+    }
+
+    .option1 { background-color: #2196F3; color: white; }
+    .option2 { background-color: #FF5722; color: white; }
+
+    /* Popup */
+    .popup {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.75);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .popup-content {
+      background: white;
+      padding: 50px 60px;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    }
+
+    .popup h2 {
+      color: #4CAF50;
+      margin-bottom: 10px;
+    }
+
+    .close-btn {
+      margin-top: 25px;
+      padding: 12px 35px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-container">
+    <h1>Custom Quiz</h1>
+    <div class="progress" id="progress">Question 1 of 5</div>
+    
+    <p class="question" id="question">Loading question...</p>
+    
+    <div class="buttons">
+      <button id="btn1" class="option1" onclick="answer(0)">Option 1</button>
+      <button id="btn2" class="option2" onclick="answer(1)">Option 2</button>
+    </div>
+  </div>
+
+  <!-- Correct Popup -->
+  <div class="popup" id="popup">
+    <div class="popup-content">
+      <h2>✅ Correct!</h2>
+      <p id="popup-text">Well done!</p>
+      <button class="close-btn" onclick="nextQuestion()">Next Question</button>
+    </div>
+  </div>
+
+  <script>
+    // ==================== EASY TO CUSTOMIZE ====================
+    const quizData = [
+      {
+        question: "What color is my eyes?",
+        answers: ["green", "brown"],     // Change these to anything you want
+        correct: 1                        // 0 = first button, 1 = second button
+      },
+      {
+        question: "when i was born?",
+        answers: ["on 12/22/2007", "on 12/21/2007"],
+        correct: 1
+      },
+      {
+        question: "What sport i like most?",
+        answers: ["MMa", "football"],
+        correct: 1
+      },
+      {
+        question: "what food im like most?",
+        answers: ["xinkali ", "mwvadi"],
+        correct: 0                        // You decide which one is correct
+      },
+      {
+        question: "What color i like most?",
+        answers: ["Blue", "Green"],
+        correct: 0
+      }
+    ];
+    // ===========================================================
+
+    let currentQuestion = 0;
+    let score = 0;
+
+    function loadQuestion() {
+      const q = quizData[currentQuestion];
+      
+      document.getElementById("question").textContent = q.question;
+      document.getElementById("btn1").textContent = q.answers[0];
+      document.getElementById("btn2").textContent = q.answers[1];
+      
+      document.getElementById("progress").textContent = 
+        `Question ${currentQuestion + 1} of ${quizData.length}`;
+    }
+
+    function answer(selected) {
+      const correctIndex = quizData[currentQuestion].correct;
+
+      if (selected === correctIndex) {
+        score++;
+        document.getElementById("popup").style.display = "flex";
+        document.getElementById("popup-text").textContent = "Excellent! 🎉";
+      } else {
+        alert(`❌ Wrong!\n\nCorrect answer was: ${quizData[currentQuestion].answers[correctIndex]}`);
+        nextQuestion();
+      }
+    }
+
+    function nextQuestion() {
+      document.getElementById("popup").style.display = "none";
+      currentQuestion++;
+
+      if (currentQuestion < quizData.length) {
+        loadQuestion();
+      } else {
+        showFinalResult();
+      }
+    }
+
+    function showFinalResult() {
+      const percentage = Math.round((score / quizData.length) * 100);
+      
+      document.querySelector(".quiz-container").innerHTML = `
+        <h1>Quiz Completed! 🎊</h1>
+        <div style="font-size: 2.5rem; margin: 40px 0; color: #4CAF50;">
+          ${score} / ${quizData.length}
+        </div>
+        <p style="font-size: 1.5rem;">
+          ${percentage}% - 
+          ${percentage >= 80 ? "Awesome!" : percentage >= 60 ? "very bad!" : "You dont know me well!"}
+        </p>
+        <button onclick="location.reload()" 
+                style="padding: 15px 40px; font-size: 1.2rem; margin-top: 30px; border-radius: 10px; cursor: pointer;">
+          Play Again
+        </button>
+      `;
+    }
+
+    // Start quiz
+    loadQuestion();
+  </script>
+
+</body>
+</html>
